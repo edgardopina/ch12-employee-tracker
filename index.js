@@ -1,16 +1,25 @@
-const db = require('./db/connection');
 const inquirer = require('inquirer');
 const { appPrompts } = require('./utils/appPrompts');
-
-const PORT = process.env.PORT || 3001;
+const Department = require('./lib/Department');
+const Employee = require('./lib/Employee');
+const Role = require('./lib/Role');
+const db = require('./db/connection');
 
 const selectTask = async () => {
-   // presents main menu
+   // obtain task answer from inquirer prompts and store to answers constant
    const answers = await inquirer.prompt(appPrompts);
 
    switch (answers.nextTask) {
       case 'View all departments':
          console.log(`~ answers.nextTask`, answers.nextTask);
+         const sql = `SELECT * FROM departments`;
+
+         db.query(sql, (err, rows) => {
+            console.log('Enter db.query: ');
+            if (err) throw err;
+            console.log('display rows:\n', rows);
+         });
+         console.log('Exit')
          break;
       case 'View all roles':
          console.log(`~ answers.nextTask`, answers.nextTask);
@@ -27,23 +36,22 @@ const selectTask = async () => {
       case 'Add an employee':
          console.log(`~ answers.nextTask`, answers.nextTask);
          break;
-      case 'Update an employees role':
+      case 'Update an employee role':
          console.log(`~ answers.nextTask`, answers.nextTask);
          break;
       case 'Exit':
          console.log(`~ answers.nextTask`, answers.nextTask);
          break;
    }
-
-   // are we done? NO-recursive call to selectTask to display main menu : YES-return selected task 'Exit'
+   // are we done? When IS NOT 'exit'- then recursive call ask for another task selection
+   // When task IS 'exit'- then stop recursive call and exit prompts.
    return answers.nextTask !== 'Exit' ? selectTask() : answers.nextTask;
 };
 
 const startApp = async () => {
    let nextTask = await selectTask();
-
-   // last instruction
    db.end();
+   return;
 };
 
 startApp();
