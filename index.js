@@ -4,28 +4,23 @@ const Department = require('./lib/Department');
 const Employee = require('./lib/Employee');
 const Role = require('./lib/Role');
 const db = require('./db/connection');
+const cTable = require('console.table');
 
 const selectTask = async () => {
    // obtain task answer from inquirer prompts and store to answers constant
    const answers = await inquirer.prompt(appPrompts);
 
+   let sql = ``;
+   let displayHeader = ``;
    switch (answers.nextTask) {
       case 'View all departments':
-         console.log(`~ answers.nextTask`, answers.nextTask);
-         const sql = `SELECT * FROM departments`;
-
-         db.query(sql, (err, rows) => {
-            console.log('Enter db.query: ');
-            if (err) throw err;
-            console.log('display rows:\n', rows);
-         });
-         console.log('Exit')
+         sql = `SELECT * FROM departments`;
          break;
       case 'View all roles':
-         console.log(`~ answers.nextTask`, answers.nextTask);
+         sql = `SELECT * FROM roles`;
          break;
       case 'View all employees':
-         console.log(`~ answers.nextTask`, answers.nextTask);
+         sql = `SELECT * FROM employees`;
          break;
       case 'Add a department':
          console.log(`~ answers.nextTask`, answers.nextTask);
@@ -41,17 +36,24 @@ const selectTask = async () => {
          break;
       case 'Exit':
          console.log(`~ answers.nextTask`, answers.nextTask);
+         db.end();
+         return;
          break;
    }
-   // are we done? When IS NOT 'exit'- then recursive call ask for another task selection
-   // When task IS 'exit'- then stop recursive call and exit prompts.
-   return answers.nextTask !== 'Exit' ? selectTask() : answers.nextTask;
+
+   db.query(sql, (err, rows) => {
+      if (err) throw err;
+      console.log(`\n ${answers.nextTask}\n`);
+      console.table(rows);
+      selectTask();
+   });
 };
 
 const startApp = async () => {
-   let nextTask = await selectTask();
-   db.end();
-   return;
+   db.connect(err => {
+      if (err) throw err;
+      selectTask();
+   });
 };
 
 startApp();
