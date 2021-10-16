@@ -9,6 +9,7 @@ async function selectTask() {
 }
 
 const runApp = async () => {
+   /* TEST ***************************/
    const respSelectedTask = await selectTask();
    console.log(`end runAPP`, respSelectedTask);
 
