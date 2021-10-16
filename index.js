@@ -11,7 +11,6 @@ const selectTask = async () => {
    const answers = await inquirer.prompt(appPrompts);
 
    let sql = ``;
-   let displayHeader = ``;
    switch (answers.nextTask) {
       case 'View all departments':
          sql = `SELECT * FROM departments`;
@@ -23,7 +22,7 @@ const selectTask = async () => {
          sql = `SELECT * FROM employees`;
          break;
       case 'Add a department':
-         console.log(`~ answers.nextTask`, answers.nextTask);
+         sql = `INSERT INTO departments (name) VALUES ('${answers.departmentName}')`;
          break;
       case 'Add a role':
          console.log(`~ answers.nextTask`, answers.nextTask);
