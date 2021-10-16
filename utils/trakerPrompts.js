@@ -1,6 +1,5 @@
 // Employee-tracker prompts
 const tasks = [
-   'Finish',
    'View all departments',
    'View all roles',
    'View all employees',
@@ -8,6 +7,7 @@ const tasks = [
    'Add a role',
    'Add an employee',
    'Update an employees role',
+   'Exit'
 ];
 
 const nextTask = [
@@ -17,7 +17,7 @@ const nextTask = [
       message: 'What would you like to do?',
       choices: tasks,
       loop: true,
-      default: 'View all departments',
+      default: 'Add a department',
    },
 ];
 //

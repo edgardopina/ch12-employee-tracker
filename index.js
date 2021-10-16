@@ -4,13 +4,20 @@ const { nextTask } = require('./utils/trakerPrompts');
 
 const PORT = process.env.PORT || 3001;
 
-async function selectTask() {
-   return await inquirer.prompt(nextTask);
+
+const selectTask = async () => {
+   // presents main menu
+   const answers = await inquirer.prompt(nextTask);
+   
+   console.log(`~ answers`, answers);
+
+   // are we done? NO-recursive call to selectTask to display main menu : YES-return selected task 'Exit'
+   return answers.task !== 'Exit' ? selectTask() : answers.task;
 }
 
 const runApp = async () => {
    /* TEST ***************************/
-   const respSelectedTask = await selectTask();
+   let respSelectedTask = await selectTask();
    console.log(`end runAPP`, respSelectedTask);
 
    // last instruction
