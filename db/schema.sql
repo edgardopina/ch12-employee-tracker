@@ -22,8 +22,8 @@ CREATE TABLE employees (
   id INTEGER AUTO_INCREMENT PRIMARY KEY,
   firstName VARCHAR(30) NOT NULL,
   lastName VARCHAR(30) NOT NULL,
-  roleId INTEGER,
-  managerId INTEGER,
+  roleId INTEGER NOT NULL,
+  managerId INTEGER DEFAULT NULL,
   CONSTRAINT fk_role
     FOREIGN KEY (roleId)
     REFERENCES roles(id)

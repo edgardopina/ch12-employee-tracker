@@ -13,77 +13,87 @@ const selectTask = async () => {
    let sql = ``;
    let displayArrayIndex = 0;
    let selectedName = ``;
-   let departmentId = 0;
    let roleId = 0;
-   let employeeId = 0;
    let managerId = 0;
+   let employeeId = 0;
    switch (answers.nextTask) {
       case 'View all departments':
          sql = `SELECT * FROM departments;`;
-         executeQuery(sql, selectedName, displayArrayIndex, answers.nextTask);
          break;
       case 'View all roles':
          sql = `SELECT * FROM roles;`;
-         executeQuery(sql, selectedName, displayArrayIndex, answers.nextTask);
          break;
       case 'View all employees':
          sql = `SELECT * FROM employees;`;
-         executeQuery(sql, selectedName, displayArrayIndex, answers.nextTask);
          break;
       case 'Add a department':
          displayArrayIndex = DEPT_INDEX;
+         selectedName = answers.departmentName;
          sql = `INSERT INTO departments (name)
                   VALUES ('${answers.departmentName}');`;
-         executeQuery(sql, answers.departmentName, DEPT_INDEX, answers.nextTask);
          break;
       case 'Add a role':
-         departmentId = displayLists[DEPT_INDEX].indexOf(answers.roleDepartmentName) + 1;
+         displayArrayIndex = ROLE_INDEX;
+         selectedName = answers.roleDepartmentName;
+         roleId = displayLists[DEPT_INDEX].indexOf(selectedName);
+         selectedName = answers.roleTitle;
+         //adding 1 to roleId to convert from array index to table ID.
          sql = `INSERT INTO roles (title, salary, departmentId)
-                  VALUES ('${answers.roleTitle}', '${answers.roleSalary}', '${departmentId}');`;
-         executeQuery(sql, answers.roleTitle, ROLE_INDEX, answers.nextTask);
+            VALUES ('${answers.roleTitle}', '${answers.roleSalary}', '${roleId + 1}');`;
          break;
       case 'Add an employee':
-         roleId = displayLists[ROLE_INDEX].indexOf(answers.employeeRoleName) + 1;
-         managerId = displayLists[MGR_INDEX6].indexOf(answers.employeeManagerName);
-         if (!managerId) {
+         const MY_NULL_CONDITION = 1;
+         displayArrayIndex = MGR_INDEX;
+         selectedName = answers.employeeRoleName;
+         roleId = displayLists[ROLE_INDEX].indexOf(selectedName) + 1;
+         selectedName = answers.employeeManagerName;
+         managerId = displayLists[displayArrayIndex].indexOf(selectedName) + 1;
+         selectedName = answers.employeeFirstName + ' ' + answers.employeeLastName;
+         if (managerId === MY_NULL_CONDITION) {
             sql = `INSERT INTO employees (firstName, lastName, roleId, managerId)
                VALUES ('${answers.employeeFirstName}', '${answers.employeeLastName}', '${roleId}', NULL);`;
          } else {
             sql = `INSERT INTO employees (firstName, lastName, roleId, managerId)
                VALUES ('${answers.employeeFirstName}', '${answers.employeeLastName}', '${roleId}', '${managerId}');`;
          }
-         executeQuery(sql, answers.employeeFirstName + ' ' + answers.employeeLastName, MGR_INDEX, answers.nextTask);
          break;
       case 'Update an employee role':
-         employeeId = displayLists[MGR_INDEX].indexOf(answers.updateEmpName);
-         roleId = displayLists[ROLE_INDEX].indexOf(answers.updateRoleName) + 1;
+         displayArrayIndex = MGR_INDEX;
+         selectedName = answers.updateEmpName;
+         console.log(`~ selectedName`, selectedName);
+         employeeId = displayLists[MGR_INDEX].indexOf(selectedName);
+         console.log(`~ employeeId`, employeeId);
+         selectedName = answers.updateRoleName;
+         console.log(`~ selectedName`, selectedName);
+         displayArrayIndex = ROLE_INDEX;
+         roleId = displayLists[displayArrayIndex].indexOf(selectedName) + 1;
+         console.log(`~ roleId`, roleId);
          sql = `UPDATE employees SET roleId = ${roleId} WHERE id = ${employeeId};`;
-         executeQuery(sql, answers.employeeFirstName + ' ' + answers.employeeLastName, MGR_INDEX, answers.nextTask);
+         console.log(`~ sql`, sql);
+         
          break;
       case 'Exit':
          db.end();
          return;
          break;
    }
+   db.query(sql, (err, rows) => {
+      if (err) throw err;
+      if (selectedName) {
+         displayLists[displayArrayIndex].push(selectedName);
+      }
+      console.log(`\n ${answers.nextTask}\n`);
+      console.table(rows);
+
+      selectTask();
+   });
 };
 
 const startApp = async () => {
-   db.connect(err => {
+   db.connect((err) => {
       if (err) throw err;
       selectTask();
    });
 };
 
 startApp();
-function executeQuery(sql, selectedName, displayArrayIndex, header) {
-   db.query(sql, (err, rows) => {
-      if (err) throw err;
-      if (selectedName) {
-         displayLists[displayArrayIndex].push(selectedName);
-      }
-      console.log(`\n ${header}\n`);
-      console.table(rows);
-
-      selectTask();
-   });
-}
