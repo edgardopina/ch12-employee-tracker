@@ -29,7 +29,9 @@ const selectTask = async () => {
                   VALUES ('${answers.roleTitle}', '${answers.roleSalary}', '${answers.roleDepartmentId}');`;
          break;
       case 'Add an employee':
-         console.log(`~ answers.nextTask`, answers.nextTask);
+         // let managerId = employeesList.indexof(answers.managerId)
+         sql = `INSERT INTO employees (firstName, lastName, roleId, managerId) 
+                  VALUES ('${answers.firstName}', '${answers.lastName}', '${answers.employeeRoleId}', '${answers.managerId}');`;
          break;
       case 'Update an employee role':
          console.log(`~ answers.nextTask`, answers.nextTask);
@@ -47,6 +49,7 @@ const selectTask = async () => {
       console.table(rows);
       selectTask();
    });
+   return;
 };
 
 const startApp = async () => {
